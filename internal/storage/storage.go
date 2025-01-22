@@ -1,11 +1,13 @@
 package storage
 
-import "errors"
+import (
+	"errors"
+)
 
 type Storage interface {
-	GetSwiftCodeDetails(swiftCode string) (Bank, error)
+	GetSwiftCodeDetails(swiftCode string) (*Bank, error)
 
-	GetSwiftCodesForCountry(iso2Code string) (CountryBanks, error)
+	GetSwiftCodesForCountry(iso2Code string) (*CountryBanks, error)
 
 	AddSwiftCodeEntry(b Bank) error
 
