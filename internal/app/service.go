@@ -22,14 +22,14 @@ func NewBankService(s storage.Storage) *BankService {
 }
 
 func (s *BankService) RegisterRoutes(router *http.ServeMux) {
-	router.HandleFunc("GET /swift-codes/{swift-code}", s.handleGetSwiftCodeDetails)
+	router.HandleFunc("GET /swift-codes/{swiftCode}", s.handleGetSwiftCodeDetails)
 	router.HandleFunc("GET /swift-codes/country/{countryISO2code}", s.handleGetCountrySwiftCodes)
 	router.HandleFunc("POST /swift-codes", s.handleAddSwiftCodeDetails)
-	router.HandleFunc("DELETE /swift-codes/{swift-code}", s.handleDeleteSwiftCode)
+	router.HandleFunc("DELETE /swift-codes/{swiftCode}", s.handleDeleteSwiftCode)
 }
 
 func (s *BankService) handleGetSwiftCodeDetails(w http.ResponseWriter, r *http.Request) {
-	swiftCode := r.PathValue("swift-code")
+	swiftCode := r.PathValue("swiftCode")
 	if swiftCode == "" {
 		utils.WriteJSON(w, http.StatusBadRequest, storage.Response{Message: "swift-code is empty"})
 		return
@@ -48,7 +48,7 @@ func (s *BankService) handleGetSwiftCodeDetails(w http.ResponseWriter, r *http.R
 }
 
 func (s *BankService) handleGetCountrySwiftCodes(w http.ResponseWriter, r *http.Request) {
-	countryISO2code := r.PathValue("country-iso-2code")
+	countryISO2code := r.PathValue("countryISO2code")
 	if countryISO2code == "" {
 		utils.WriteJSON(w, http.StatusBadRequest, storage.Response{Message: "country-iso-2code is empty"})
 		return
@@ -102,11 +102,11 @@ func (s *BankService) handleAddSwiftCodeDetails(w http.ResponseWriter, r *http.R
 	}
 
 	utils.WriteJSON(w, http.StatusOK,
-		storage.Response{Message: fmt.Sprintf("Successfully added bank with swift code %s", bank.SwiftCode)})
+		storage.Response{Message: fmt.Sprintf("Successfully added bank with swift code %s", *bank.SwiftCode)})
 }
 
 func (s *BankService) handleDeleteSwiftCode(w http.ResponseWriter, r *http.Request) {
-	swiftCode := r.PathValue("swift-code")
+	swiftCode := r.PathValue("swiftCode")
 	if swiftCode == "" {
 		utils.WriteJSON(w, http.StatusBadRequest, storage.Response{Message: "swift-code is empty"})
 		return

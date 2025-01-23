@@ -18,10 +18,10 @@ func NewAPIServer(address string, storage storage.Storage) *APIServer {
 }
 
 func (s *APIServer) Start(ctx context.Context) error {
-	router := http.NewServeMux()
+	//router := http.NewServeMux()
 	subrouter := http.NewServeMux()
 
-	router.Handle("/v1/", http.StripPrefix("/v1/", subrouter))
+	//subrouter.Handle("/v1/", http.StripPrefix("/v1/", router))
 
 	bankService := NewBankService(s.storage)
 	bankService.RegisterRoutes(subrouter)
