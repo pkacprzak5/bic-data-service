@@ -131,48 +131,48 @@ func isValidISO2(code string) bool {
 }
 
 func validateBankData(b storage.Bank) error {
-	if strings.TrimSpace(b.Address) == "" {
+	if b.Address == nil {
 		return errors.New("address is required")
 	}
 
-	if strings.TrimSpace(b.BankName) == "" {
+	if b.BankName == nil || strings.TrimSpace(*b.BankName) == "" {
 		return errors.New("bankName is required")
 	}
 
-	if b.CountryISO2 == "" {
+	if b.CountryISO2 == nil {
 		return errors.New("countryISO2 is required")
 	}
 
-	if !isValidISO2(b.CountryISO2) {
-		return errors.New("countryISO2 is invalid")
-	}
-
-	if b.CountryName == "" {
+	if b.CountryName == nil {
 		return errors.New("countryName is required")
-	}
-
-	b.CountryName = strings.ToUpper(b.CountryName)
-	if b.CountryName != iso2CodeToCountry(b.CountryISO2) {
-		return errors.New("countryName does not match ISO2 code")
 	}
 
 	if b.IsHeadquarter == nil {
 		return errors.New("isHeadquarter is required")
 	}
 
-	if b.SwiftCode == "" {
+	if !isValidISO2(*b.CountryISO2) {
+		return errors.New("countryISO2 is invalid")
+	}
+
+	*b.CountryName = strings.ToUpper(*b.CountryName)
+	if *b.CountryName != iso2CodeToCountry(*b.CountryISO2) {
+		return errors.New("countryName does not match ISO2 code")
+	}
+
+	if b.SwiftCode == nil {
 		return errors.New("swiftCode is required")
 	}
 
-	if !isValidSWIFT(b.SwiftCode) {
+	if !isValidSWIFT(*b.SwiftCode, *b.CountryISO2) {
 		return errors.New("swiftCode is invalid")
 	}
 
-	if strings.HasSuffix(b.SwiftCode, "XXX") && !*b.IsHeadquarter {
+	if strings.HasSuffix(*b.SwiftCode, "XXX") && !*b.IsHeadquarter {
 		return errors.New("swiftCode indicates bank's headquarter")
 	}
 
-	if *b.IsHeadquarter && !strings.HasSuffix(b.SwiftCode, "XXX") {
+	if *b.IsHeadquarter && !strings.HasSuffix(*b.SwiftCode, "XXX") {
 		return errors.New("swiftCode indicates bank's branch")
 	}
 
@@ -189,8 +189,11 @@ func iso2CodeToCountry(code string) string {
 	return ""
 }
 
-func isValidSWIFT(s string) bool {
-	regex := `^[A-Za-z]{4}[A-Za-z]{2}[A-Za-z0-9]{2}([A-Za-z0-9]{3})?$`
+func isValidSWIFT(s, iso2Code string) bool {
+	if s[4:6] != iso2Code { // it should match countryISO2Code of bank location
+		return false
+	}
+	regex := `^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$`
 	matched, _ := regexp.MatchString(regex, s)
 	return matched
 }

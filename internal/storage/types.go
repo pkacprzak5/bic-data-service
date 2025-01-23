@@ -5,12 +5,12 @@ type Response struct {
 }
 
 type Bank struct {
-	Address       string       `json:"address"`
-	BankName      string       `json:"bankName"`
-	CountryISO2   string       `json:"countryISO2"`
-	CountryName   string       `json:"countryName"`
+	Address       *string      `json:"address"`
+	BankName      *string      `json:"bankName"`
+	CountryISO2   *string      `json:"countryISO2"`
+	CountryName   *string      `json:"countryName"`
 	IsHeadquarter *bool        `json:"isHeadquarter"`
-	SwiftCode     string       `json:"swiftCode"`
+	SwiftCode     *string      `json:"swiftCode"`
 	Branches      []BankBranch `json:"branches"`
 }
 
