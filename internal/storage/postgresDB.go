@@ -3,6 +3,7 @@ package storage
 import (
 	"database/sql"
 	"fmt"
+	_ "github.com/lib/pq"
 	"log"
 )
 
@@ -10,17 +11,9 @@ type PostgreSQLStorage struct {
 	db *sql.DB
 }
 
-type PostgresConfig struct {
-	Host     string
-	Port     int
-	User     string
-	Password string
-	Database string
-}
-
 func NewPostgreSQLStorage(config PostgresConfig) (*PostgreSQLStorage, error) {
-	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s",
-		config.Host, config.Port, config.User, config.Password, config.Database)
+	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s",
+		config.Host, config.DB_Port, config.User, config.Password, config.Database)
 
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
@@ -40,6 +33,10 @@ func NewPostgreSQLStorage(config PostgresConfig) (*PostgreSQLStorage, error) {
 }
 
 func (s *PostgreSQLStorage) Init() (*sql.DB, error) {
+	_, err := s.db.Exec("CREATE EXTENSION IF NOT EXISTS pg_trgm;")
+	if err != nil {
+		return nil, fmt.Errorf("failed to create pg_trgm extension: %v", err)
+	}
 	if err := s.createBankTable(); err != nil {
 		return nil, err
 	}

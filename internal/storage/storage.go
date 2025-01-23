@@ -16,4 +16,4 @@ type Storage interface {
 
 var ErrSwiftCodeNotFound = errors.New("Given Swift Code not found")
 var ErrISO2CodeNotFound = errors.New("Country with given ISO2 Code does not have any swift codes")
-var ErrSwiftCodeExists = errors.New("Given Swift Code already exists")
+var ErrSwiftCodeExists = errors.New("Given Swift Code already exists in database")

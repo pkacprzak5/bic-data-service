@@ -11,10 +11,14 @@ type RelationalDB struct {
 	db *sql.DB
 }
 
+func NewRelationalDB(db *sql.DB) *RelationalDB {
+	return &RelationalDB{db: db}
+}
+
 func (r *RelationalDB) GetSwiftCodeDetails(swiftCode string) (*Bank, error) {
 	query := `SELECT address, bankName, countryISO2, countryName, isHeadquarter, swiftCode
 		FROM BanksData
-		WHERE swiftCode = ?`
+		WHERE swiftCode = $1`
 
 	var bank Bank
 	err := r.db.QueryRow(query, swiftCode).
@@ -32,7 +36,7 @@ func (r *RelationalDB) GetSwiftCodeDetails(swiftCode string) (*Bank, error) {
 
 	query = `SELECT address, bankName, countryISO2, isHeadquarter, swiftCode
 		FROM BanksData
-		WHERE swiftCode LIKE ?`
+		WHERE swiftCode LIKE $1`
 
 	rows, err := r.db.Query(query, fmt.Sprintf("%s%", swiftCode[:8]))
 	if err != nil {
@@ -60,7 +64,7 @@ func (r *RelationalDB) GetSwiftCodeDetails(swiftCode string) (*Bank, error) {
 func (r *RelationalDB) GetSwiftCodesForCountry(iso2Code string) (*CountryBanks, error) {
 	query := `SELECT countryISO2, countryName, address, bankName, isHeadquarter, swiftCode 
 		FROM BanksData
-		WHERE countryISO2 = ?`
+		WHERE countryISO2 = $1`
 
 	rows, err := r.db.Query(query, iso2Code)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -102,7 +106,7 @@ func (r *RelationalDB) GetSwiftCodesForCountry(iso2Code string) (*CountryBanks, 
 
 func (r *RelationalDB) AddSwiftCodeEntry(b Bank) error {
 	query := `INSERT INTO BanksData (address, bankName, countryISO2, countryName, isHeadquarter, swiftCode)
-		VALUES (?, ?, ?, ?, ?, ?)`
+		VALUES ($1, $2, $3, $4, $5, $6)`
 
 	_, err := r.db.Exec(query, b.Address, b.BankName, b.CountryISO2, b.CountryName, b.IsHeadquarter, b.SwiftCode)
 
@@ -117,13 +121,13 @@ func (r *RelationalDB) AddSwiftCodeEntry(b Bank) error {
 }
 
 func (r *RelationalDB) DeleteSwiftCodeEntry(swiftCode string) error {
-	query := `SELECT swiftCode FROM BanksData WHERE swiftCode = ?`
+	query := `SELECT swiftCode FROM BanksData WHERE swiftCode = $1`
 	_, err := r.db.Exec(query, swiftCode)
 	if errors.Is(err, sql.ErrNoRows) {
 		return ErrSwiftCodeNotFound
 	}
 
-	query = `DELETE FROM BanksData WHERE swiftCode = ?`
+	query = `DELETE FROM BanksData WHERE swiftCode = $1`
 	_, err = r.db.Exec(query, swiftCode)
 
 	return err
