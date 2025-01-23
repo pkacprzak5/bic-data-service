@@ -31,7 +31,7 @@ func (s *BankService) RegisterRoutes(router *http.ServeMux) {
 func (s *BankService) handleGetSwiftCodeDetails(w http.ResponseWriter, r *http.Request) {
 	swiftCode := r.PathValue("swiftCode")
 	if swiftCode == "" {
-		utils.WriteJSON(w, http.StatusBadRequest, storage.Response{Message: "swift-code is empty"})
+		utils.WriteJSON(w, http.StatusBadRequest, storage.Response{Message: "swiftCode is empty"})
 		return
 	}
 
@@ -50,12 +50,12 @@ func (s *BankService) handleGetSwiftCodeDetails(w http.ResponseWriter, r *http.R
 func (s *BankService) handleGetCountrySwiftCodes(w http.ResponseWriter, r *http.Request) {
 	countryISO2code := r.PathValue("countryISO2code")
 	if countryISO2code == "" {
-		utils.WriteJSON(w, http.StatusBadRequest, storage.Response{Message: "country-iso-2code is empty"})
+		utils.WriteJSON(w, http.StatusBadRequest, storage.Response{Message: "countryISO2code not found in path"})
 		return
 	}
 
 	if countryISO2code != strings.ToUpper(countryISO2code) || !isValidISO2(countryISO2code) {
-		utils.WriteJSON(w, http.StatusBadRequest, storage.Response{Message: "country-iso-2code is invalid"})
+		utils.WriteJSON(w, http.StatusBadRequest, storage.Response{Message: "countryISO2code is invalid"})
 		return
 	}
 
@@ -78,7 +78,13 @@ func (s *BankService) handleAddSwiftCodeDetails(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	defer r.Body.Close()
+	defer func(Body io.ReadCloser) {
+		if err := Body.Close(); err != nil {
+			utils.WriteJSON(w, http.StatusInternalServerError,
+				storage.Response{Message: "Error closing body: " + err.Error()})
+			return
+		}
+	}(r.Body)
 
 	var bank storage.Bank
 	err = json.Unmarshal(body, &bank)
@@ -151,6 +157,10 @@ func validateBankData(b storage.Bank) error {
 		return errors.New("isHeadquarter is required")
 	}
 
+	if b.SwiftCode == nil {
+		return errors.New("swiftCode is required")
+	}
+
 	if !isValidISO2(*b.CountryISO2) {
 		return errors.New("countryISO2 is invalid")
 	}
@@ -158,10 +168,6 @@ func validateBankData(b storage.Bank) error {
 	*b.CountryName = strings.ToUpper(*b.CountryName)
 	if *b.CountryName != iso2CodeToCountry(*b.CountryISO2) {
 		return errors.New("countryName does not match ISO2 code")
-	}
-
-	if b.SwiftCode == nil {
-		return errors.New("swiftCode is required")
 	}
 
 	if !isValidSWIFT(*b.SwiftCode, *b.CountryISO2) {
