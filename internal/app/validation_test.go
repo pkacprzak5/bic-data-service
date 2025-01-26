@@ -836,3 +836,162 @@ func TestValidateBankData_CorrectData(t *testing.T) {
 		})
 	}
 }
+
+func TestIsValidISO2_ValidCodes(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  bool
+	}{
+		{
+			name:  "Valid ISO2Code for Poland",
+			input: "PL",
+			want:  true,
+		},
+		{
+			name:  "Valid ISO2Code for USA",
+			input: "US",
+			want:  true,
+		},
+		{
+			name:  "Valid ISO2Code for Germany",
+			input: "DE",
+			want:  true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			flag := isValidISO2(tt.input)
+			if !flag {
+				t.Errorf("isValidISO2(%v) returned false, should return true", tt.input)
+			}
+		})
+	}
+}
+
+func TestIsValidISO2_InvalidCodes(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  bool
+	}{
+		{
+			name:  "Invalid ISO2Code ZZ",
+			input: "ZZ",
+			want:  false,
+		},
+		{
+			name:  "Invalid ISO2Code pl",
+			input: "pl",
+			want:  false,
+		},
+		{
+			name:  "Invalid ISO2Code pl",
+			input: "1234",
+			want:  false,
+		},
+		{
+			name:  "Invalid ISO2Code pl",
+			input: "PLDE",
+			want:  false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			flag := isValidISO2(tt.input)
+			if flag {
+				t.Errorf("isValidISO2(%v) returned true, should return false", tt.input)
+			}
+		})
+	}
+}
+
+func TestIso2CodeToCountry(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  string
+	}{
+		{
+			name:  "ISO2Code for Poland",
+			input: "PL",
+			want:  "POLAND",
+		},
+		{
+			name:  "ISO2Code for Germany",
+			input: "DE",
+			want:  "GERMANY",
+		},
+		{
+			name:  "Invalid ISO2Code ZZ",
+			input: "ZZ",
+			want:  "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			countryName := iso2CodeToCountry(tt.input)
+			if countryName != tt.want {
+				t.Errorf("iso2CodeToCountry(%v) returned %v, should return %v", tt.input, countryName, tt.want)
+			}
+		})
+	}
+}
+
+func TestIsValidSWIFT(t *testing.T) {
+	tests := []struct {
+		name      string
+		inputCode string
+		iso2Code  string
+		want      bool
+	}{
+		{
+			name:      "Valid SWIFT Code for Poland",
+			inputCode: "TESTPL33AAA",
+			iso2Code:  "PL",
+			want:      true,
+		},
+		{
+			name:      "Valid SWIFT Code for Germany",
+			inputCode: "TESTDE33XXX",
+			iso2Code:  "DE",
+			want:      true,
+		},
+		{
+			name:      "Invalid SWIFT Code for Poland",
+			inputCode: "TESTDE33XXX",
+			iso2Code:  "PL",
+			want:      false,
+		},
+		{
+			name:      "Invalid SWIFT Code for Germany",
+			inputCode: "TESTPL33XXX",
+			iso2Code:  "DE",
+			want:      false,
+		},
+		{
+			name:      "Invalid SWIFT Code format (only numbers)",
+			inputCode: "1234",
+			iso2Code:  "PL",
+			want:      false,
+		},
+		{
+			name:      "Invalid SWIFT Code format (wrong length)",
+			inputCode: "AABBDDSSGGGGSS",
+			iso2Code:  "PL",
+			want:      false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			flag := isValidSWIFT(tt.inputCode, tt.iso2Code)
+			if flag != tt.want {
+				t.Errorf("isValidSWIFT(%v) returned %v, should return %v", tt.inputCode, flag, tt.want)
+			}
+		})
+	}
+}
