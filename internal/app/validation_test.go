@@ -691,7 +691,31 @@ func TestValidateBankData_InvalidData(t *testing.T) {
 		name      string
 		input     storage.Bank
 		wantError error
-	}{ //todo: test for US
+	}{
+		{
+			name: "Bank name is empty",
+			input: storage.Bank{
+				Address:       strPtr("123 Test Street"),
+				BankName:      strPtr(""),
+				CountryISO2:   strPtr("PL"),
+				CountryName:   strPtr("POLAND"),
+				IsHeadquarter: boolPtr(true),
+				SwiftCode:     strPtr("TESTPL33XXX"),
+			},
+			wantError: errors.New("bankName is required"),
+		},
+		{
+			name: "Bank name have only whitespaces",
+			input: storage.Bank{
+				Address:       strPtr("123 Test Street"),
+				BankName:      strPtr("  "),
+				CountryISO2:   strPtr("PL"),
+				CountryName:   strPtr("POLAND"),
+				IsHeadquarter: boolPtr(true),
+				SwiftCode:     strPtr("TESTPL33XXX"),
+			},
+			wantError: errors.New("bankName is required"),
+		},
 		{
 			name: "Invalid ISO2 code",
 			input: storage.Bank{
