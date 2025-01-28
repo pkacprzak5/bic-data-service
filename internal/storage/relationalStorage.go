@@ -38,7 +38,7 @@ func (r *RelationalDB) GetSwiftCodeDetails(swiftCode string) (*Bank, error) {
 		FROM BanksData
 		WHERE swiftCode LIKE $1`
 
-	rows, err := r.db.Query(query, fmt.Sprintf("%s%", swiftCode[:8]))
+	rows, err := r.db.Query(query, fmt.Sprintf("%s%%", swiftCode[:8]))
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (r *RelationalDB) GetSwiftCodeDetails(swiftCode string) (*Bank, error) {
 	for rows.Next() {
 		var b BankBranch
 
-		err := rows.Scan(&b.Address, &b.BankName, b.CountryISO2, &b.IsHeadquarter, &b.SwiftCode)
+		err := rows.Scan(&b.Address, &b.BankName, &b.CountryISO2, &b.IsHeadquarter, &b.SwiftCode)
 		if err != nil {
 			return nil, err
 		}

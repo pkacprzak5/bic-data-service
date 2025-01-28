@@ -11,19 +11,40 @@ type PostgreSQLStorage struct {
 	db *sql.DB
 }
 
+// Helper function that returns errors (for testing)
+func newPostgreSQLStorage(config PostgresConfig) (*PostgreSQLStorage, error) {
+	connStr := fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s",
+		config.Host, config.DB_Port, config.User, config.Password, config.Database,
+	)
+
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to database: %v", err)
+	}
+
+	if err = db.Ping(); err != nil {
+		return nil, fmt.Errorf("failed to ping database: %v", err)
+	}
+
+	log.Println("Successfully connected to database")
+	return &PostgreSQLStorage{db: db}, nil
+}
+
+// Public function that exits on error (for production)
 func NewPostgreSQLStorage(config PostgresConfig) (*PostgreSQLStorage, error) {
 	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s",
 		config.Host, config.DB_Port, config.User, config.Password, config.Database)
 
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		log.Fatal("Failed to connect to database: %v", err)
+		log.Fatalln(fmt.Sprintf("Failed to connect to database: %v", err))
 		return nil, err
 	}
 
 	err = db.Ping()
 	if err != nil {
-		log.Fatal("Failed to ping database: %v", err)
+		log.Fatalln(fmt.Sprintf("Failed to ping database: %v", err))
 		return nil, err
 	}
 

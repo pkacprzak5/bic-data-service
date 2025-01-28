@@ -7,6 +7,7 @@ import (
 	"github.com/pkacprzak5/bic-data-service/internal/storage"
 	"github.com/pkacprzak5/bic-data-service/pkg/utils"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -29,7 +30,7 @@ func (s *BankService) RegisterRoutes(router *http.ServeMux) {
 func (s *BankService) handleGetSwiftCodeDetails(w http.ResponseWriter, r *http.Request) {
 	swiftCode := r.PathValue("swiftCode")
 	if swiftCode == "" {
-		utils.WriteJSON(w, http.StatusBadRequest, storage.Response{Message: "swiftCode is empty"})
+		utils.WriteJSON(w, http.StatusBadRequest, storage.Response{Message: "swiftCode not found in path"})
 		return
 	}
 
@@ -78,8 +79,7 @@ func (s *BankService) handleAddSwiftCodeDetails(w http.ResponseWriter, r *http.R
 
 	defer func(Body io.ReadCloser) {
 		if err := Body.Close(); err != nil {
-			utils.WriteJSON(w, http.StatusInternalServerError,
-				storage.Response{Message: "Error closing body: " + err.Error()})
+			log.Println(fmt.Sprintf("Error closing request body: %v", err))
 			return
 		}
 	}(r.Body)
@@ -112,7 +112,14 @@ func (s *BankService) handleAddSwiftCodeDetails(w http.ResponseWriter, r *http.R
 func (s *BankService) handleDeleteSwiftCode(w http.ResponseWriter, r *http.Request) {
 	swiftCode := r.PathValue("swiftCode")
 	if swiftCode == "" {
-		utils.WriteJSON(w, http.StatusBadRequest, storage.Response{Message: "swift-code is empty"})
+		utils.WriteJSON(w, http.StatusBadRequest, storage.Response{Message: "swift-code not found in path"})
+		return
+	}
+
+	iso2Code := swiftCode[4:6] // part of SWIFT code requirements
+
+	if !isValidISO2(iso2Code) || !isValidSWIFT(swiftCode, iso2Code) {
+		utils.WriteJSON(w, http.StatusBadRequest, storage.Response{Message: "swift-code is invalid"})
 		return
 	}
 

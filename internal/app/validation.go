@@ -9,6 +9,9 @@ import (
 )
 
 func isValidISO2(code string) bool {
+	if code != strings.ToUpper(code) {
+		return false
+	}
 	_, flag := country.ByAlpha2CodeStr(code)
 	return flag
 }
@@ -73,10 +76,10 @@ func iso2CodeToCountry(code string) string {
 }
 
 func isValidSWIFT(s, iso2Code string) bool {
-	if s[4:6] != iso2Code { // it should match countryISO2Code of bank location
-		return false
-	}
 	regex := `^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$`
 	matched, _ := regexp.MatchString(regex, s)
+	if !matched || s[4:6] != iso2Code { // it should match countryISO2Code of bank location
+		return false
+	}
 	return matched
 }
