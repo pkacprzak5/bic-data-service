@@ -3,6 +3,10 @@ package app
 import (
 	"context"
 	"github.com/pkacprzak5/bic-data-service/internal/storage"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 )
@@ -117,4 +121,53 @@ func TestAPIServer_StorageIntegration(t *testing.T) {
 
 	cancel()
 	<-errChan
+}
+
+func TestAPIServer_Routes(t *testing.T) {
+	// Mock storage
+	mockStorage := &mockStorageApi{
+		getSwiftCodeDetailsFunc: func(swiftCode string) (*storage.Bank, error) {
+			return nil, storage.ErrSwiftCodeNotFound
+		},
+	}
+
+	// Configuration of test server
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		//apiServer := NewAPIServer(":0", mockStorage)
+		router := http.NewServeMux()
+		subrouter := http.NewServeMux()
+		router.Handle("/v1/", http.StripPrefix("/v1", subrouter))
+
+		bankService := NewBankService(mockStorage)
+		bankService.RegisterRoutes(subrouter)
+
+		router.ServeHTTP(w, r)
+	}))
+	defer testServer.Close()
+
+	// Testing endpoints
+	testCases := []struct {
+		method string
+		path   string
+		expect int
+	}{
+		{"GET", "/v1/swift-codes/TEST33PLXXX", http.StatusBadRequest},
+		{"GET", "/v1/swift-codes/country/PL3", http.StatusBadRequest},
+		{"POST", "/v1/swift-codes", http.StatusBadRequest},
+		{"DELETE", "/v1/swift-codes/INVALID", http.StatusBadRequest},
+		{"GET", "/v1/non-existent-route", http.StatusNotFound},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.method+" "+tc.path, func(t *testing.T) {
+			req, err := http.NewRequest(tc.method, testServer.URL+tc.path, nil)
+			require.NoError(t, err)
+
+			resp, err := http.DefaultClient.Do(req)
+			require.NoError(t, err)
+			defer resp.Body.Close()
+
+			assert.Equal(t, tc.expect, resp.StatusCode)
+		})
+	}
 }

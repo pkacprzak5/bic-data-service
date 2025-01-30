@@ -61,7 +61,18 @@ func TestHandleGetSwiftCodeDetails(t *testing.T) {
 		},
 		{
 			name:      "swift code not found",
-			swiftCode: "NOTFOUND",
+			swiftCode: "INVALID_CODE",
+			mockStorage: &mockStorage{
+				GetSwiftCodeDetailsFunc: func(_ string) (*storage.Bank, error) {
+					return nil, storage.ErrSwiftCodeNotFound
+				},
+			},
+			expectedStatus: http.StatusBadRequest,
+			expectedMsg:    "swiftCode is invalid",
+		},
+		{
+			name:      "swift code not found",
+			swiftCode: "TESTPL33XXX",
 			mockStorage: &mockStorage{
 				GetSwiftCodeDetailsFunc: func(_ string) (*storage.Bank, error) {
 					return nil, storage.ErrSwiftCodeNotFound
@@ -72,7 +83,7 @@ func TestHandleGetSwiftCodeDetails(t *testing.T) {
 		},
 		{
 			name:      "storage error",
-			swiftCode: "ERROR",
+			swiftCode: "TESTPL33XXX",
 			mockStorage: &mockStorage{
 				GetSwiftCodeDetailsFunc: func(_ string) (*storage.Bank, error) {
 					return nil, errors.New("storage error")

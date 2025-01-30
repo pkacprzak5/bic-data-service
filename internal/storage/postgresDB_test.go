@@ -35,9 +35,9 @@ func TestNewPostgreSQLStorage_Success(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}
-	defer storage.db.Close()
+	defer storage.Db.Close()
 
-	if storage.db == nil {
+	if storage.Db == nil {
 		t.Error("Database connection is nil")
 	}
 }
@@ -76,10 +76,10 @@ func TestInit_CreatesSchema(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to connect: %v", err)
 	}
-	defer storage.db.Close()
+	defer storage.Db.Close()
 
 	defer func() {
-		_, err := storage.db.Exec("DROP TABLE IF EXISTS BanksData CASCADE")
+		_, err := storage.Db.Exec("DROP TABLE IF EXISTS BanksData CASCADE")
 		if err != nil {
 			t.Errorf("Failed to clean up tables: %v", err)
 		}
@@ -121,10 +121,10 @@ func TestInit_IsIdempotent(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to connect: %v", err)
 	}
-	defer storage.db.Close()
+	defer storage.Db.Close()
 
 	defer func() {
-		_, err := storage.db.Exec("DROP TABLE IF EXISTS BanksData CASCADE")
+		_, err := storage.Db.Exec("DROP TABLE IF EXISTS BanksData CASCADE")
 		if err != nil {
 			t.Errorf("Failed to clean up tables: %v", err)
 		}
@@ -146,10 +146,10 @@ func TestBanksData_UniqueSwiftCode(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to connect: %v", err)
 	}
-	defer storage.db.Close()
+	defer storage.Db.Close()
 
 	defer func() {
-		_, err := storage.db.Exec("DROP TABLE IF EXISTS BanksData CASCADE")
+		_, err := storage.Db.Exec("DROP TABLE IF EXISTS BanksData CASCADE")
 		if err != nil {
 			t.Errorf("Failed to clean up tables: %v", err)
 		}
@@ -159,7 +159,7 @@ func TestBanksData_UniqueSwiftCode(t *testing.T) {
 		t.Fatalf("Init failed: %v", err)
 	}
 
-	_, err = storage.db.Exec(
+	_, err = storage.Db.Exec(
 		`INSERT INTO BanksData 
 			(address, bankname, isheadquarter, countryname, countryiso2, swiftcode)
 		VALUES 
@@ -170,7 +170,7 @@ func TestBanksData_UniqueSwiftCode(t *testing.T) {
 		t.Fatalf("Failed to insert first record: %v", err)
 	}
 
-	_, err = storage.db.Exec(
+	_, err = storage.Db.Exec(
 		`INSERT INTO BanksData 
 			(address, bankname, isheadquarter, countryname, countryiso2, swiftcode)
 		VALUES 
