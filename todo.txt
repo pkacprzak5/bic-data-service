@@ -1,8 +1,0 @@
-//tasks todo
-
-End2End tests:
- - test if all endpoints work correctly together
-
-Additional:
- - create python script that puts all data from csv file to json request 
-     body and runs POST to put all data into database
