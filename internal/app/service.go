@@ -34,6 +34,11 @@ func (s *BankService) handleGetSwiftCodeDetails(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	if !isValidSWIFT(swiftCode, swiftCode[4:6]) {
+		utils.WriteJSON(w, http.StatusBadRequest, storage.Response{Message: "swiftCode is invalid"})
+		return
+	}
+
 	bank, err := s.storage.GetSwiftCodeDetails(swiftCode)
 	if err != nil && errors.Is(err, storage.ErrSwiftCodeNotFound) {
 		utils.WriteJSON(w, http.StatusNotFound, storage.Response{Message: err.Error()})

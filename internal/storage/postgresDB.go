@@ -8,7 +8,7 @@ import (
 )
 
 type PostgreSQLStorage struct {
-	db *sql.DB
+	Db *sql.DB
 }
 
 // Helper function that returns errors (for testing)
@@ -28,7 +28,7 @@ func newPostgreSQLStorage(config PostgresConfig) (*PostgreSQLStorage, error) {
 	}
 
 	log.Println("Successfully connected to database")
-	return &PostgreSQLStorage{db: db}, nil
+	return &PostgreSQLStorage{Db: db}, nil
 }
 
 // Public function that exits on error (for production)
@@ -50,22 +50,22 @@ func NewPostgreSQLStorage(config PostgresConfig) (*PostgreSQLStorage, error) {
 
 	log.Println("Successfully connected to database")
 
-	return &PostgreSQLStorage{db: db}, nil
+	return &PostgreSQLStorage{Db: db}, nil
 }
 
 func (s *PostgreSQLStorage) Init() (*sql.DB, error) {
-	_, err := s.db.Exec("CREATE EXTENSION IF NOT EXISTS pg_trgm;")
+	_, err := s.Db.Exec("CREATE EXTENSION IF NOT EXISTS pg_trgm;")
 	if err != nil {
 		return nil, fmt.Errorf("failed to create pg_trgm extension: %v", err)
 	}
 	if err := s.createBankTable(); err != nil {
 		return nil, err
 	}
-	return s.db, nil
+	return s.Db, nil
 }
 
 func (s *PostgreSQLStorage) createBankTable() error {
-	_, err := s.db.Exec(`
+	_, err := s.Db.Exec(`
 			CREATE TABLE IF NOT EXISTS BanksData (
 			    address TEXT NOT NULL,
 			    bankName TEXT NOT NULL,
