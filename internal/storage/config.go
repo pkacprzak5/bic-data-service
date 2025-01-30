@@ -30,9 +30,9 @@ func initConfig() PostgresConfig {
 	return PostgresConfig{
 		Port:     getEnv("PORT", "8080"),
 		DB_Port:  getEnv("DB_PORT", "5432"),
-		User:     getEnv("USER", "example_user"),
-		Password: getEnv("PASSWORD", "Passwd@1234"),
-		Host:     getEnv("HOST", "localhost"),
+		User:     getEnv("DB_USER", "example_user"),
+		Password: getEnv("DB_PASSWORD", "Passwd@1234"),
+		Host:     getEnv("DB_HOST", "localhost"),
 		Database: getEnv("DB_NAME", "bicdatabase"),
 	}
 }

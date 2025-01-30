@@ -12,3 +12,16 @@ test-unit:
 
 test-integration:
 	@go test -v -tags=integration ./...
+
+# Docker commands
+docker-up:
+	docker-compose up --build
+
+docker-down:
+	docker-compose down
+
+docker-reset-database:
+	docker-compose down -v
+
+docker-test:
+	docker-compose run app go test -v ./...

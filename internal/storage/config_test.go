@@ -9,12 +9,12 @@ import (
 
 func TestInitConfig(t *testing.T) {
 	originalEnv := map[string]string{
-		"PORT":     os.Getenv("PORT"),
-		"DB_PORT":  os.Getenv("DB_PORT"),
-		"USER":     os.Getenv("USER"),
-		"PASSWORD": os.Getenv("PASSWORD"),
-		"HOST":     os.Getenv("HOST"),
-		"DB_NAME":  os.Getenv("DB_NAME"),
+		"PORT":        os.Getenv("PORT"),
+		"DB_PORT":     os.Getenv("DB_PORT"),
+		"DB_USER":     os.Getenv("DB_USER"),
+		"DB_PASSWORD": os.Getenv("DB_PASSWORD"),
+		"DB_HOST":     os.Getenv("DB_HOST"),
+		"DB_NAME":     os.Getenv("DB_NAME"),
 	}
 	t.Cleanup(func() {
 		for k, v := range originalEnv {
@@ -29,9 +29,9 @@ func TestInitConfig(t *testing.T) {
 	t.Run("fallback values when no env vars", func(t *testing.T) {
 		os.Unsetenv("PORT")
 		os.Unsetenv("DB_PORT")
-		os.Unsetenv("USER")
-		os.Unsetenv("PASSWORD")
-		os.Unsetenv("HOST")
+		os.Unsetenv("DB_USER")
+		os.Unsetenv("DB_PASSWORD")
+		os.Unsetenv("DB_HOST")
 		os.Unsetenv("DB_NAME")
 
 		config := initConfig()
@@ -47,9 +47,9 @@ func TestInitConfig(t *testing.T) {
 	t.Run("environment variables override fallbacks", func(t *testing.T) {
 		t.Setenv("PORT", "9090")
 		t.Setenv("DB_PORT", "6432")
-		t.Setenv("USER", "test_user")
-		t.Setenv("PASSWORD", "Test@1234")
-		t.Setenv("HOST", "test_host")
+		t.Setenv("DB_USER", "test_user")
+		t.Setenv("DB_PASSWORD", "Test@1234")
+		t.Setenv("DB_HOST", "test_host")
 		t.Setenv("DB_NAME", "test_db")
 
 		config := initConfig()
@@ -70,9 +70,9 @@ func TestInitConfig(t *testing.T) {
 
 		envContent := `PORT=7070
 					DB_PORT=5433
-					USER=env_user
-					PASSWORD=Env@1234
-					HOST=env_host
+					DB_USER=env_user
+					DB_PASSWORD=Env@1234
+					DB_HOST=env_host
 					DB_NAME=env_db`
 		require.NoError(t, os.WriteFile(".env", []byte(envContent), 0644))
 
@@ -89,9 +89,9 @@ func TestInitConfig(t *testing.T) {
 	t.Run("invalid .env file uses fallbacks", func(t *testing.T) {
 		os.Unsetenv("PORT")
 		os.Unsetenv("DB_PORT")
-		os.Unsetenv("USER")
-		os.Unsetenv("PASSWORD")
-		os.Unsetenv("HOST")
+		os.Unsetenv("DB_USER")
+		os.Unsetenv("DB_PASSWORD")
+		os.Unsetenv("DB_HOST")
 		os.Unsetenv("DB_NAME")
 
 		tempDir := t.TempDir()
