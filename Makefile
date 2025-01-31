@@ -24,4 +24,5 @@ docker-reset-database:
 	docker-compose down -v
 
 docker-test:
-	docker-compose run app go test -v ./...
+	docker-compose -f docker-compose.test.yaml up --build --abort-on-container-exit
+	docker-compose -f docker-compose.test.yaml down -v

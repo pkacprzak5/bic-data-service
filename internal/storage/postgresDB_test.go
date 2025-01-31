@@ -10,7 +10,7 @@ import (
 
 func getValidTestConfig() PostgresConfig {
 	return PostgresConfig{
-		Host:     "localhost",
+		Host:     "db",
 		DB_Port:  "5432",
 		User:     "test_user",
 		Password: "Test@1234",
