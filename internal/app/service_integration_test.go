@@ -22,11 +22,11 @@ type IntegrationTestSuite struct {
 
 func (s *IntegrationTestSuite) SetupSuite() {
 	config := storage.PostgresConfig{
-		Host:     "localhost",
-		DB_Port:  "5432",
-		User:     "test_user",
-		Password: "Test@1234",
-		Database: "testdatabase",
+		DB_Port:  storage.GetEnv("DB_PORT", "5432"),
+		User:     storage.GetEnv("DB_USER", "test_user"),
+		Password: storage.GetEnv("DB_PASSWORD", "Test@1234"),
+		Host:     storage.GetEnv("DB_HOST", "localhost"),
+		Database: storage.GetEnv("DB_NAME", "testdatabase"),
 	}
 
 	var err error

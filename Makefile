@@ -7,9 +7,6 @@ build:
 test:
 	@go test -v ./...
 
-test-unit:
-	@go test -v -short ./...
-
 test-integration:
 	@go test -v -tags=integration ./...
 
@@ -23,6 +20,6 @@ docker-down:
 docker-reset-database:
 	docker-compose down -v
 
-docker-test:
+docker-test: # includes all tests
 	docker-compose -f docker-compose.test.yaml up --build --abort-on-container-exit
 	docker-compose -f docker-compose.test.yaml down -v

@@ -1,7 +1,7 @@
 services:
   app:
     container_name: test_app
-    command: [ "go", "test", "-v", "./..." ]
+    command: [ "go", "test", "-v", "-tags=integration", "./..." ]
     build:
       context: .
       dockerfile: Dockerfile

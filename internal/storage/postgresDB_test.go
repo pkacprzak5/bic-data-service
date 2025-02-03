@@ -10,11 +10,11 @@ import (
 
 func getValidTestConfig() PostgresConfig {
 	return PostgresConfig{
-		Host:     "db",
-		DB_Port:  "5432",
-		User:     "test_user",
-		Password: "Test@1234",
-		Database: "testdatabase",
+		DB_Port:  GetEnv("DB_PORT", "5432"),
+		User:     GetEnv("DB_USER", "test_user"),
+		Password: GetEnv("DB_PASSWORD", "Test@1234"),
+		Host:     GetEnv("DB_HOST", "localhost"),
+		Database: GetEnv("DB_NAME", "testdatabase"),
 	}
 }
 

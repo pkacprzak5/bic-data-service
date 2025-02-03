@@ -28,16 +28,16 @@ func initConfig() PostgresConfig {
 		}
 	}
 	return PostgresConfig{
-		Port:     getEnv("PORT", "8080"),
-		DB_Port:  getEnv("DB_PORT", "5432"),
-		User:     getEnv("DB_USER", "example_user"),
-		Password: getEnv("DB_PASSWORD", "Passwd@1234"),
-		Host:     getEnv("DB_HOST", "localhost"),
-		Database: getEnv("DB_NAME", "bicdatabase"),
+		Port:     GetEnv("PORT", "8080"),
+		DB_Port:  GetEnv("DB_PORT", "5432"),
+		User:     GetEnv("DB_USER", "example_user"),
+		Password: GetEnv("DB_PASSWORD", "Passwd@1234"),
+		Host:     GetEnv("DB_HOST", "localhost"),
+		Database: GetEnv("DB_NAME", "bicdatabase"),
 	}
 }
 
-func getEnv(key, fallback string) string {
+func GetEnv(key, fallback string) string {
 	if value, ok := os.LookupEnv(key); ok {
 		return value
 	}
