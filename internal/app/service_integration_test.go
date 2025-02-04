@@ -150,3 +150,16 @@ func (s *IntegrationTestSuite) TestCountryCodes() {
 	assert.NoError(s.T(), json.NewDecoder(res.Body).Decode(&country))
 	assert.Len(s.T(), country.SwiftCodes, 2)
 }
+
+func (s *IntegrationTestSuite) TestCountryCodeWithNoData() {
+	req := httptest.NewRequest(http.MethodGet, "/swift-codes/country/IT", nil)
+	req = setPathVars(req, map[string]string{"countryISO2code": "IT"})
+	rec := httptest.NewRecorder()
+
+	s.service.handleGetCountrySwiftCodes(rec, req)
+
+	res := rec.Result()
+	defer res.Body.Close()
+
+	assert.Equal(s.T(), http.StatusNotFound, res.StatusCode)
+}

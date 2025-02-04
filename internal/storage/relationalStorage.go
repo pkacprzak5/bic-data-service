@@ -67,15 +67,17 @@ func (r *RelationalDB) GetSwiftCodesForCountry(iso2Code string) (*CountryBanks, 
 		WHERE countryISO2 = $1`
 
 	rows, err := r.db.Query(query, iso2Code)
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil, ErrISO2CodeNotFound
-	} else if err != nil {
+	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
+	if !rows.Next() {
+		return nil, ErrISO2CodeNotFound
+	}
+
 	var countryBanks CountryBanks
-	for rows.Next() {
+	for {
 		var address, bankName, countryName, swiftCode, countryISO2 string
 		var isHeadquarter bool
 
@@ -95,6 +97,10 @@ func (r *RelationalDB) GetSwiftCodesForCountry(iso2Code string) (*CountryBanks, 
 		countryBanks.SwiftCodes = append(countryBanks.SwiftCodes, bankBranch)
 		countryBanks.CountryISO2 = countryISO2
 		countryBanks.CountryName = countryName
+
+		if !rows.Next() {
+			break
+		}
 	}
 
 	if err := rows.Err(); err != nil {

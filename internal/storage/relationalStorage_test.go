@@ -102,7 +102,7 @@ func TestGetSwiftCodeDetails(t *testing.T) {
 }
 
 func TestGetSwiftCodesForCountry(t *testing.T) {
-	t.Run("CountryNotFound", func(t *testing.T) {
+	t.Run("ValidCountryWithoutData", func(t *testing.T) {
 		db, mock, err := sqlmock.New()
 		if err != nil {
 			t.Fatalf("failed to create mock: %v", err)
@@ -110,11 +110,11 @@ func TestGetSwiftCodesForCountry(t *testing.T) {
 		defer db.Close()
 
 		storage := NewRelationalDB(db)
-		iso2Code := "XX"
+		iso2Code := "PL"
 
 		mock.ExpectQuery(`SELECT countryISO2, countryName, address, bankName, isHeadquarter, swiftCode FROM BanksData WHERE countryISO2 = \$1`).
 			WithArgs(iso2Code).
-			WillReturnError(sql.ErrNoRows)
+			WillReturnRows(sqlmock.NewRows([]string{}))
 
 		result, err := storage.GetSwiftCodesForCountry(iso2Code)
 		if !errors.Is(err, ErrISO2CodeNotFound) {
@@ -138,8 +138,8 @@ func TestGetSwiftCodesForCountry(t *testing.T) {
 		mock.ExpectQuery(`SELECT countryISO2, countryName, address, bankName, isHeadquarter, swiftCode FROM BanksData WHERE countryISO2 = \$1`).
 			WithArgs(iso2Code).
 			WillReturnRows(sqlmock.NewRows([]string{"countryISO2", "countryName", "address", "bankName", "isHeadquarter", "swiftCode"}).
-				AddRow("US", "USA", "Addr1", "Bank1", false, "BANK1US").
-				AddRow("US", "USA", "Addr2", "Bank2", true, "BANK2US"))
+				AddRow("US", "USA", "Addr1", "Bank1", false, "BANKUS11XXX").
+				AddRow("US", "USA", "Addr2", "Bank2", true, "BANKUS22XXX"))
 
 		result, err := storage.GetSwiftCodesForCountry(iso2Code)
 		if err != nil {
