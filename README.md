@@ -29,7 +29,7 @@ git clone https://github.com/pkacprzak5/bic-data-service.git
 
 ### 2. Navigate to repository path
 ```
-cd <your-path>/TrafficTracking
+cd <your-path>/bic-data-service
 ```
 
 ### 3. Download dependencies and run app in Docker
