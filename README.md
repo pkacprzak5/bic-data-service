@@ -27,6 +27,8 @@ BIC Data Service is an appliaction useful for storing bank's data. This service 
 
 Before running this application, please ensure that **port 5432** (PostgreSQL) and **port 8080** (backend service) are not in use by other processes.  
 
+For running tests, ensure that **port 5433** and **port 8081** are not in use by other processes. 
+
 If these ports are already occupied, the application may fail to start or encounter connectivity issues. You can check for processes using these ports with:
 #### On Linux/macOS:
 ```sh
@@ -81,11 +83,15 @@ docker-compose down -v
 ```
 
 ### 6. Running tests
-- unit tests and integration tests
+- unit tests
   ```
-  make docker-test
+  make docker-test-unit
   ```
-- unit tests and end2end tests
+- integration tests
+  ```
+  make docker-test-integration
+  ```
+- end2end tests
   ```
   make docker-test-end2end
   ```
