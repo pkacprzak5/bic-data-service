@@ -24,7 +24,7 @@ type IntegrationTestSuite struct {
 }
 
 func (s *IntegrationTestSuite) SetupSuite() {
-	s.serverURL = "http://localhost:8000"
+	s.serverURL = fmt.Sprintf("http://localhost:%s", storage.GetEnv("PORT", "8081"))
 	initTestEnvs()
 	s.dbConfig = storage.PostgresConfig{
 		DB_Port:  storage.GetEnv("DB_PORT", "5432"),
@@ -37,7 +37,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 
 func initTestEnvs() {
 	if _, exists := os.LookupEnv("PORT"); !exists {
-		os.Setenv("PORT", "8000")
+		os.Setenv("PORT", "8081")
 	}
 	if _, exists := os.LookupEnv("DB_PORT"); !exists {
 		os.Setenv("DB_PORT", "5432")

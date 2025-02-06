@@ -13,6 +13,14 @@ import (
 	"testing"
 )
 
+// Helper to set path variables in the request context
+func setPathVars(r *http.Request, vars map[string]string) *http.Request {
+	for k, v := range vars {
+		r.SetPathValue(k, v)
+	}
+	return r
+}
+
 type IntegrationTestSuite struct {
 	suite.Suite
 	db        *storage.PostgreSQLStorage
